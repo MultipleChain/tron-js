@@ -64,7 +64,7 @@ class Wallet {
     connect() {
         return new Promise(async (resolve, reject) => {
             if (!this.isTronLink()) {
-                return reject('wallet-not-detected');
+                return reject('wallet-not-found');
             }
 
             let result = await tronLink.request({method: 'tron_requestAccounts'});

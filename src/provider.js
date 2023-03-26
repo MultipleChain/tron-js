@@ -72,9 +72,9 @@ class Provider {
      * @returns {Array}
      */
     getDetectedWallets(filter) {
-        return this.detectedWallets.filter((wallet) => {
-            return filter.includes(wallet.name);
-        });
+        return Object.fromEntries(Object.entries(this.detectedWallets).filter(([key]) => {
+            return filter.includes(key);
+        }));
     }
 
     detectWallets() {

@@ -6,7 +6,7 @@ module.exports = {
     entry: './src/provider.js',
     output: {
         path: path.join(__dirname, "/dist"),
-        filename: 'provider.js',
+        filename: 'tron-provider.js',
         library: 'Tron',
         libraryTarget: 'umd',
         globalObject: 'this',
