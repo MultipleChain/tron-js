@@ -12,7 +12,7 @@
     "dist",
     "resources"
   ],
-  "main": "dist/provider.js",
+  "main": "dist/tron-provider.js",
   "types": "index.d.ts",
   "typings": "index.d.ts",
   "prepublishOnly": "npm run build",

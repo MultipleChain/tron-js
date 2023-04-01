@@ -41,6 +41,11 @@ class Provider {
     detectedWallets = [];
 
     /**
+     * @var {Object}
+     */
+    connectedWallet;
+
+    /**
      * @param {Boolean} testnet 
      */
     constructor(testnet = false) {
@@ -65,6 +70,13 @@ class Provider {
                 utils.rejectMessage(error, reject);
             });
         });
+    }
+
+    /**
+     * @param {Object} wallet 
+     */
+    setConnectedWallet(wallet) {
+        this.connectedWallet = wallet;
     }
 
     /**

@@ -81,6 +81,8 @@ class Wallet {
                 return reject('not-accepted-chain');
             }
 
+            this.provider.setConnectedWallet(this)
+
             return resolve(this.connectedAccount = tronLink.tronWeb.defaultAddress.base58);
         });
     }
