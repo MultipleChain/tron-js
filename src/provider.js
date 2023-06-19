@@ -1,10 +1,16 @@
 
+const TronWeb = require('tronweb');
 const utils = require('./utils');
 const Coin = require('./entity/coin');
 const Token = require('./entity/token');
 const Transaction = require('./entity/transaction');
 
 class Provider {
+
+    /**
+     * @var {Object}
+     */
+    web3;
 
     /**
      * @var {Boolean}
@@ -19,13 +25,13 @@ class Provider {
         mainnet: {
             node: "mainnet",
             name: "TronGrid Mainnet",
-            host: "https://api.trongrid.io",
-            explorer: "https://tronscan.io/"
+            host: "https://api.trongrid.io/",
+            explorer: "https://tronscan.org/"
         },
         testnet: {
             node: "testnet",
-            name: "Nile Testnet",
-            host: "https://api.nileex.io",
+            name: "Shasta Testnet",
+            host: "https://api.shasta.trongrid.io/",
             explorer: "https://nile.tronscan.org/"
         }
     }
@@ -52,6 +58,11 @@ class Provider {
         this.testnet = testnet;
 
         this.network = this.networks[this.testnet ? 'testnet' : 'mainnet'];
+
+        this.web3 = new TronWeb({
+            fullHost: this.network.host,
+            solidityNode: this.network.host,
+        });
 
         this.detectWallets();
     }
@@ -96,6 +107,37 @@ class Provider {
                 this.detectedWallets['tronlink'] = new Wallet(this);
             }
         }
+    }
+
+    /**
+     * @param {String} receiver 
+     * @param {Number} amount
+     * @returns {Object}
+     */
+    async getLastTransactionByReceiver(receiver, tokenAddress) {
+        
+        let tx = await fetch(this.network.host + 'v1/accounts/' + receiver + '/transactions?limit=1')
+        .then(response => response.json());
+        tx = tx.data[0];
+        let hash = tx.txID;
+
+        let amount;
+        if (tokenAddress) {
+            tx = this.Transaction(hash);
+            let data = await tx.decodeInput();
+            this.web3.setAddress(tokenAddress);
+            let token = await this.web3.contract().at(tokenAddress);
+            let decimals = parseFloat((await token.decimals().call()).toString(10));
+            amount = utils.toDec(data.amount, decimals);
+        } else {
+            let params = tx.raw_data.contract[0].parameter.value;
+            amount = parseFloat(this.web3.fromSun(params.amount));
+        }
+
+        return {
+            hash,
+            amount
+        };
     }
 
     /**

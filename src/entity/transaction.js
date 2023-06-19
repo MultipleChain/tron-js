@@ -64,10 +64,10 @@ class Transaction {
      * @returns {Object}
      */
     async decodeInput() {
-        let decoder = new TxDecoder(tronLink.tronWeb.fullNode.host);
+        let decoder = new TxDecoder(this.provider.network.host);
         let {decodedInput} = await decoder.decodeInputById(this.hash);
         
-        let receiver = tronLink.tronWeb.address.fromHex(decodedInput[0]);
+        let receiver = this.provider.web3.address.fromHex(decodedInput[0]);
         let amount = decodedInput[1]._hex;
         
         return { receiver, amount };
