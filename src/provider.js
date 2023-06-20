@@ -25,13 +25,13 @@ class Provider {
         mainnet: {
             node: "mainnet",
             name: "TronGrid Mainnet",
-            host: "https://api.trongrid.io/",
+            host: "https://api.trongrid.io",
             explorer: "https://tronscan.org/"
         },
         testnet: {
             node: "testnet",
-            name: "Shasta Testnet",
-            host: "https://api.shasta.trongrid.io/",
+            name: "TronGrid Nile Testnet",
+            host: "https://nile.trongrid.io",
             explorer: "https://nile.tronscan.org/"
         }
     }
@@ -116,9 +116,17 @@ class Provider {
      */
     async getLastTransactionByReceiver(receiver, tokenAddress) {
         
-        let tx = await fetch(this.network.host + 'v1/accounts/' + receiver + '/transactions?limit=1')
+        let tx = await fetch(this.network.host + '/v1/accounts/' + receiver + '/transactions?limit=1&only_from=true')
         .then(response => response.json());
         tx = tx.data[0];
+
+        if (!tx) {
+            return {
+                hash: null,
+                amount: 0
+            }
+        }
+
         let hash = tx.txID;
 
         let amount;
