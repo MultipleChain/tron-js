@@ -51,8 +51,8 @@ class Transaction {
      */
     async getData() {
         try {
-            this.data = await tronLink.tronWeb.trx.getTransaction(this.hash);
-            this.data.info = await tronLink.tronWeb.trx.getTransactionInfo(this.hash);
+            this.data = await this.provider.web3.trx.getTransaction(this.hash);
+            this.data.info = await this.provider.web3.trx.getTransactionInfo(this.hash);
         } catch (error) {
             throw new Error('data-request-failed');
         }
@@ -79,7 +79,7 @@ class Transaction {
     async getConfirmations() {
         try {
             let data = await this.getData();
-            let currentBlock = await tronLink.tronWeb.trx.getBlockNumber();
+            let currentBlock = await this.provider.web3.trx.getBlockNumber();
             if (data.info && data.info.blockNumber === null) return 0;
             let blockNumber = utils.toDec(data.info.blockNumber, 0);
             let confirmations = currentBlock - blockNumber;
@@ -161,7 +161,7 @@ class Transaction {
     async verifyTokenTransferWithData(receiver, amount, address) {
         if (await this.validate()) {
             let decodedInput = await this.decodeInput();
-            let token = await tronLink.tronWeb.contract().at(address);
+            let token = await this.provider.web3.contract().at(address);
             let decimals = parseFloat((await token.decimals().call()).toString(10));
 
             let data = {
@@ -188,8 +188,8 @@ class Transaction {
         if (await this.validate()) {
             let params = this.data.raw_data.contract[0].parameter.value;
             let data = {
-                receiver: String(tronLink.tronWeb.address.fromHex(params.to_address)).toLowerCase(),
-                amount: parseFloat(tronLink.tronWeb.fromSun(params.amount))
+                receiver: String(this.provider.web3.address.fromHex(params.to_address)).toLowerCase(),
+                amount: parseFloat(this.provider.web3.fromSun(params.amount))
             };
 
             if (data.receiver == receiver.toLocaleLowerCase() && String(data.amount) == String(amount)) {
