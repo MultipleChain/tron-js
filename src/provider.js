@@ -116,9 +116,11 @@ class Provider {
      */
     async getLastTransactionByReceiver(receiver, tokenAddress) {
         
-        let tx = await fetch(this.network.host + '/v1/accounts/' + receiver + '/transactions?limit=1&only_from=true')
+        let tx = await fetch(this.network.host + '/v1/accounts/' + receiver + '/transactions?limit=1&only_to=true&search_internal=false')
         .then(response => response.json());
         tx = tx.data[0];
+
+        console.log(tx);
 
         if (!tx) {
             return {

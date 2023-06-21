@@ -77,7 +77,14 @@ class Wallet {
                 return reject('request-rejected');
             }
 
-            if (tronLink.tronWeb.fullNode.host != this.provider.network.host) {
+            let currentHost = this.provider.network.host;
+            currentHost = currentHost.replace(/\/+$/, '');
+
+            if (this.provider.testnet) {
+                currentHost = 'https://api.nileex.io';
+            }
+
+            if (tronLink.tronWeb.fullNode.host != currentHost) {
                 return reject('not-accepted-chain');
             }
 
