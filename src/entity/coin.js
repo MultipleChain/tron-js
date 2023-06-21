@@ -39,7 +39,7 @@ class Coin {
     }
     
     async getBalance(address) {
-        return parseFloat(tronLink.tronWeb.fromSun(await tronLink.tronWeb.trx.getBalance(address)));
+        return parseFloat(this.provider.web3.fromSun(await this.provider.web3.trx.getBalance(address)));
     }
 
     /**

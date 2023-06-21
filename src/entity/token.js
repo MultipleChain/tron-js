@@ -32,7 +32,7 @@ class Token {
      * @returns {String|Object}
      */
     async getName() {
-        let token = await tronLink.tronWeb.contract().at(this.address);
+        let token = await this.provider.web3.contract().at(this.address);
         return await token.name().call();
     }
 
@@ -40,7 +40,7 @@ class Token {
      * @returns {String|Object}
      */
     async getSymbol() {
-        let token = await tronLink.tronWeb.contract().at(this.address);
+        let token = await this.provider.web3.contract().at(this.address);
         return await token.symbol().call();
     }
 
@@ -48,7 +48,7 @@ class Token {
      * @returns {String|Object}
      */
     async getDecimals() {
-        let token = await tronLink.tronWeb.contract().at(this.address);
+        let token = await this.provider.web3.contract().at(this.address);
         return parseFloat((await token.decimals().call()).toString(10));
     }
 
@@ -56,7 +56,7 @@ class Token {
      * @returns {Float|Object}
      */
     async getTotalSupply() {
-        let token = await tronLink.tronWeb.contract().at(this.address);
+        let token = await this.provider.web3.contract().at(this.address);
         let totalSupply = parseFloat((await token.totalSupply().call()).toString(10));
         return utils.toDec(totalSupply, await this.getDecimals());
     }
@@ -67,7 +67,7 @@ class Token {
      * @returns {Number}
      */
     async getBalance(address) {
-        let token = await tronLink.tronWeb.contract().at(this.address);
+        let token = await this.provider.web3.contract().at(this.address);
         let decimals = parseFloat((await token.decimals().call()).toString(10));
         let balance = parseFloat((await token.balanceOf(address).call()).toString(10));
 
