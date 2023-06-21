@@ -115,31 +115,30 @@ class Provider {
      * @returns {Object}
      */
     async getLastTransactionByReceiver(receiver, tokenAddress) {
-        
-        let tx = await fetch(this.network.host + '/v1/accounts/' + receiver + '/transactions?limit=1&only_to=true&search_internal=false')
-        .then(response => response.json());
-        tx = tx.data[0];
-
-        if (!tx) {
-            return {
-                hash: null,
-                amount: 0
-            }
-        }
-
-        let hash = tx.txID;
-
-        let amount;
+        let amount, hash;
         if (tokenAddress) {
-            tx = this.Transaction(hash);
+            let tx = (await fetch(this.network.host + '/v1/accounts/' + receiver + '/transactions/trc20?limit=1&only_to=true&contract_address='+tokenAddress).then(response => response.json()));
+
+            if (tx.data.length == 0) {
+                return {
+                    hash: null,
+                    amount: 0
+                };
+            }
+
+            tx = tx.data[0];
+            hash = tx.transaction_id;
+            tx = this.Transaction(tx.transaction_id);
             let data = await tx.decodeInput();
             this.web3.setAddress(tokenAddress);
             let token = await this.web3.contract().at(tokenAddress);
             let decimals = parseFloat((await token.decimals().call()).toString(10));
             amount = utils.toDec(data.amount, decimals);
         } else {
+            let tx = (await fetch(this.network.host + '/v1/accounts/' + receiver + '/transactions?limit=1&only_to=true&search_internal=false').then(response => response.json())).data[0];
             let params = tx.raw_data.contract[0].parameter.value;
             amount = parseFloat(this.web3.fromSun(params.amount));
+            hash = tx.txID;
         }
 
         return {
