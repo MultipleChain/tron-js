@@ -120,8 +120,6 @@ class Provider {
         .then(response => response.json());
         tx = tx.data[0];
 
-        console.log(tx);
-
         if (!tx) {
             return {
                 hash: null,
