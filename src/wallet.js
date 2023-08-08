@@ -36,22 +36,34 @@ class Wallet {
     /**
      * @returns {String}
      */
-    getType() {
-        return 'browser';
+    getSupports() {
+        return ['browser', 'mobile'];
     }
 
     /**
      * @returns {String}
      */
     getDeepLink() {
-        return 'tronlinkoutside://pull.activity?param={}';
+        return 'tronlinkoutside://pull.activity?param=' + JSON.stringify({
+            "url": "{siteUrl}", 
+            "action": "open",
+            "protocol": "tronlink",
+            "version": "1.0"
+        });
     }
 
     /**
      * @returns {String}
      */
     getDownloadLink() {
-        return 'https://www.tronlink.org/';
+        return 'https://www.tronlink.org/dlDetails/';
+    }
+
+    /**
+     * @returns {Boolean}
+     */
+    isDetected() {
+        return Boolean(this.isTronLink());
     }
 
     /**
