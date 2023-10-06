@@ -10,7 +10,8 @@ module.exports = Object.assign(utils, {
         if (typeof error == 'object') {
             if (
                 String(error.message).includes('Confirmation declined by user') ||
-                String(error.message).includes('User rejected the request.')
+                String(error.message).includes('User rejected the request.') ||
+                String(error.message).includes('The user rejected connection.')
             ) {
                 return reject('request-rejected');
             } else if (String(error.message).includes('The wallet is not found.')) {

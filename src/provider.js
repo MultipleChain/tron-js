@@ -155,7 +155,7 @@ class Provider {
         if (typeof window != 'undefined') {
             const Wallet = require('./wallet');
 
-            if (window.tronLink) {
+            if (window.tronLink && window.tronLink.tronlinkParams) {
                 this.detectedWallets['tronlink'] = new Wallet('tronlink', this);
             }
             
@@ -167,9 +167,9 @@ class Provider {
                 this.detectedWallets['okx'] = new Wallet('okx', this);
             }
 
-            //if (window.ethereum && window.ethereum.isTokenPocket) {
-            //if (window.tokenpocket && tokenpocket.ethereum) {
-            this.detectedWallets['tokenpocket'] = new Wallet('tokenpocket', this);
+            if (window.tokenpocket && window.tokenpocket.tron) {
+                this.detectedWallets['tokenpocket'] = new Wallet('tokenpocket', this);
+            }
 
             this.detectedWallets['walletconnect'] = new Wallet('walletconnect', this);
         }

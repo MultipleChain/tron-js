@@ -45,6 +45,6 @@ module.exports = tronlink = (provider) => {
             "version": "1.0"
         }),
         download: 'https://www.tronlink.org/dlDetails/',
-        detected : Boolean(typeof window.tronLink != 'undefined')
+        detected : Boolean(window.tronLink && window.tronLink.tronlinkParams)
     }
 }

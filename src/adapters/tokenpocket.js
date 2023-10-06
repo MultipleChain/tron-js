@@ -32,6 +32,7 @@ module.exports = tokenpocket = (provider) => {
             "chain": "Tron",
             "source": "{siteUrl}",
         }),
-        download: 'https://www.tokenpocket.pro/en/download/app'
+        download: 'https://www.tokenpocket.pro/en/download/app',
+        detected : Boolean(window.tokenpocket && window.tokenpocket.tron)
     }
 }
