@@ -27,7 +27,7 @@ module.exports = (provider) => {
             'mobile'
         ],
         connect,
-        deepLink: 'tpdapp://open?param=' + JSON.stringify({
+        deepLink: 'tpdapp://open?params=' + JSON.stringify({
             "url": "{siteUrl}", 
             "chain": "Tron",
             "source": "{siteUrl}",
