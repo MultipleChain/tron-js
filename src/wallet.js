@@ -1,109 +1,99 @@
 const utils = require('./utils');
+const getAdapter = require('./get-adapter');
 
 class Wallet {
 
     /**
      * @var {Object}
      */
-    provider;
+    adapter;
 
+    /**
+     * @var {Object}
+     */
+    wallet;
+    
+    /**
+     * @var {Object}
+     */
+    provider;
+    
     /**
      * @var {String}
      */
     connectedAccount;
-
     /**
      * @param {Object} provider 
      */
-    constructor(provider) {
+    constructor(adapter, provider) {
         this.provider = provider;
+        this.setAdapter(adapter);
+    }
+
+    /**
+     * @param {String} adapter 
+     */
+    setAdapter(adapter) {
+        this.adapter = getAdapter(adapter, this.provider);
     }
 
     /**
      * @returns {String}
      */
     getKey() {
-        return 'tronlink';
+        return this.adapter.key;
     }
 
     /**
      * @returns {String}
      */
     getName() {
-        return 'TronLink';
+        return this.adapter.name;
     }
 
     /**
      * @returns {String}
      */
     getSupports() {
-        return ['browser', 'mobile'];
+        return this.adapter.supports;
     }
 
     /**
      * @returns {String}
      */
     getDeepLink() {
-        return 'tronlinkoutside://pull.activity?param=' + JSON.stringify({
-            "url": "{siteUrl}", 
-            "action": "open",
-            "protocol": "tronlink",
-            "version": "1.0"
-        });
+        return this.adapter.deepLink;
     }
 
     /**
      * @returns {String}
      */
     getDownloadLink() {
-        return 'https://www.tronlink.org/dlDetails/';
+        return this.adapter.download;
     }
 
     /**
      * @returns {Boolean}
      */
     isDetected() {
-        return Boolean(this.isTronLink());
-    }
-
-    /**
-     * @returns {Boolean}
-     */
-    isTronLink() {
-        return window.tronLink;
+        return this.adapter.detected;
     }
 
     connect() {
-        return new Promise(async (resolve, reject) => {
-            if (!this.isTronLink()) {
-                return reject('wallet-not-found');
-            }
+        return new Promise((resolve, reject) => {
+            this.adapter.connect()
+            .then(async wallet => {
+                this.wallet = wallet;
+                this.provider.setConnectedWallet(this);
 
-            let result = await tronLink.request({method: 'tron_requestAccounts'});
-            
-            if (!result) {
-                return reject('locked-wallet');
-            }
-
-            if (result.code == 4001) {
-                return reject('request-rejected');
-            }
-
-            let currentHost = this.provider.network.host;
-            currentHost = currentHost.replace(/\/+$/, '');
-
-            if (this.provider.testnet) {
-                currentHost = 'https://api.nileex.io';
-            }
-
-            if (tronLink.tronWeb.fullNode.host != currentHost) {
-                return reject('not-accepted-chain');
-            }
-
-            this.provider.setConnectedWallet(this)
-
-            return resolve(this.connectedAccount = tronLink.tronWeb.defaultAddress.base58);
-        });
+                this.connectedAccount = wallet.address;
+                this.connectedNetwork = this.provider.network;
+                resolve(this.connectedAccount);
+            })
+            .catch(error => {
+                utils.rejectMessage(error, reject);
+            });
+        })
     }
 
     /**
@@ -113,9 +103,9 @@ class Wallet {
     sendTransaction(transaction) {
         return new Promise(async (resolve, reject) => {
             try {
-                let signedTransaction = await tronLink.tronWeb.trx.sign(transaction);
-                let {txid} = await tronLink.tronWeb.trx.sendRawTransaction(signedTransaction);
-                return resolve(txid);
+                let signedTransaction = await this.wallet.signTransaction(transaction);
+                let {txid} = await this.provider.web3.trx.sendRawTransaction(signedTransaction);
+                return resolve(this.provider.Transaction(txid));
             } catch (error) {
                 if (error == "Confirmation declined by user") {
                     return reject('request-rejected');
@@ -138,8 +128,9 @@ class Wallet {
             try {
                 this.validate(to, amount, tokenAddress);
                 let token = this.provider.Token(tokenAddress);
+                let txObj = await token.transfer(this.connectedAccount, to, amount);
 
-                token.transfer(this.connectedAccount, to, amount)
+                this.sendTransaction(txObj)
                 .then((transaction) => {
                     resolve(transaction);
                 })
@@ -163,8 +154,10 @@ class Wallet {
             try {
                 this.validate(to, amount);
                 let coin = this.provider.Coin();
+
+                let txObj = await coin.transfer(this.connectedAccount, to, amount);
                 
-                coin.transfer(this.connectedAccount, to, amount)
+                this.sendTransaction(txObj)
                 .then((transaction) => {
                     resolve(transaction);
                 })
@@ -197,7 +190,7 @@ class Wallet {
      * @return {String}
      */
     addressToHex(address) {
-        return tronLink.tronWeb.address.toHex(address);
+        return this.provider.web3.address.toHex(address);
     }
 
     /**
@@ -205,7 +198,7 @@ class Wallet {
      * @return {String}
      */
     addressFromHex(address) {
-        return tronLink.tronWeb.address.fromHex(address);
+        return this.provider.web3.address.fromHex(address);
     }
 
     /**
@@ -213,7 +206,7 @@ class Wallet {
      * @return {Object}
      */
     contract(...params) {
-        return tronLink.tronWeb.contract(...params);
+        return this.provider.web3.contract(...params);
     }
 
     /**
@@ -223,11 +216,11 @@ class Wallet {
     deployContract(params) {
         return new Promise(async (resolve, reject) => {
             try {
-                let transaction = await tronLink.tronWeb.transactionBuilder.createSmartContract(params, this.connectedAccount);
+                let transaction = await this.wallet.transactionBuilder.createSmartContract(params, this.connectedAccount);
 
-                let signedTransaction = await tronLink.tronWeb.trx.sign(transaction);
+                let signedTransaction = await this.wallet.trx.sign(transaction);
 
-                let {txid} = await tronLink.tronWeb.trx.sendRawTransaction(signedTransaction);
+                let {txid} = await this.wallet.trx.sendRawTransaction(signedTransaction);
 
                 return resolve(this.provider.Transaction(txid));
             } catch (error) {
@@ -245,7 +238,7 @@ class Wallet {
      * @returns {Mixed}
      */
     async triggerSmartContract(...params) {
-        return tronLink.tronWeb.transactionBuilder.triggerSmartContract(...params);
+        return this.wallet.transactionBuilder.triggerSmartContract(...params);
     }
     
     /**

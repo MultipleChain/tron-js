@@ -7,6 +7,12 @@ module.exports = Object.assign(utils, {
             reject('same-account');
         }
 
+        if (typeof error == 'object') {
+            if (String(error.message).includes('Confirmation declined by user')) {
+                return reject('request-rejected');
+            }
+        }
+
         return reject(error);
     }
 })

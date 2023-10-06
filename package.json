@@ -1,7 +1,7 @@
 {
   "namespace": "multiplechain",
   "name": "@multiplechain/tron",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Tron has ready-made methods to connect to wallets and perform many transactions.",
   "scripts": {
     "serve": "parcel test.html --no-cache --dist-dir test",
@@ -9,8 +9,8 @@
     "push": "webpack && npm publish"
   },
   "files": [
-    "dist",
-    "resources"
+    "src",
+    "dist"
   ],
   "main": "dist/tron-provider.js",
   "types": "index.d.ts",
@@ -34,6 +34,7 @@
   "dependencies": {
     "@beycandeveloper/tron-tx-decoder": "^2.0.4",
     "@multiplechain/utils": "^0.1.1",
+    "@tronweb3/tronwallet-adapters": "^1.1.8",
     "tronweb": "^5.2.0"
   },
   "devDependencies": {

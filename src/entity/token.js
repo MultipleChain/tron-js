@@ -12,6 +12,8 @@ class Token {
      */
     provider;
 
+    token;
+
     /**
      * @param {String} address 
      * @param {Provider} provider
@@ -19,6 +21,16 @@ class Token {
     constructor(address, provider) {
         this.address = address;
         this.provider = provider;
+
+        this.setToken();
+    }
+
+    async setToken() {
+        if (!this.token) {
+            this.token = await this.provider.web3.contract().at(this.address);
+        }
+        this.provider.web3.setAddress(this.address);
+        return this.token;
     }
 
     /**
@@ -32,32 +44,32 @@ class Token {
      * @returns {String|Object}
      */
     async getName() {
-        let token = await this.provider.web3.contract().at(this.address);
-        return await token.name().call();
+        await this.setToken();
+        return await this.token.name().call();
     }
 
     /**
      * @returns {String|Object}
      */
     async getSymbol() {
-        let token = await this.provider.web3.contract().at(this.address);
-        return await token.symbol().call();
+        await this.setToken();
+        return await this.token.symbol().call();
     }
 
     /**
      * @returns {String|Object}
      */
     async getDecimals() {
-        let token = await this.provider.web3.contract().at(this.address);
-        return parseFloat((await token.decimals().call()).toString(10));
+        await this.setToken();
+        return parseFloat((await this.token.decimals().call()).toString(10));
     }
 
     /**
      * @returns {Float|Object}
      */
     async getTotalSupply() {
-        let token = await this.provider.web3.contract().at(this.address);
-        let totalSupply = parseFloat((await token.totalSupply().call()).toString(10));
+        await this.setToken();
+        let totalSupply = parseFloat((await tthis.oken.totalSupply().call()).toString(10));
         return utils.toDec(totalSupply, await this.getDecimals());
     }
 
@@ -67,11 +79,9 @@ class Token {
      * @returns {Number}
      */
     async getBalance(address) {
-        let token = await this.provider.web3.contract().at(this.address);
-        let decimals = parseFloat((await token.decimals().call()).toString(10));
-        let balance = parseFloat((await token.balanceOf(address).call()).toString(10));
-
-        return utils.toDec(balance, decimals);
+        await this.setToken();
+        let balance = parseFloat((await this.token.balanceOf(address).call()).toString(10));
+        return utils.toDec(balance, await this.getDecimals());
     }
 
     /**
@@ -107,7 +117,7 @@ class Token {
                     feeLimit: 100000000                    
                 };
 
-                let transactionObject = await tronLink.tronWeb.transactionBuilder.triggerSmartContract(
+                let transactionObject = await this.provider.web3.transactionBuilder.triggerSmartContract(
                     this.address, 
                     "transfer(address,uint256)", 
                     options, 
@@ -115,16 +125,9 @@ class Token {
                     from
                 );
                 
-                let signedTransaction = await tronLink.tronWeb.trx.sign(transactionObject.transaction);
-
-                let {txid} = await tronLink.tronWeb.trx.sendRawTransaction(signedTransaction);
-
-                return resolve(this.provider.Transaction(txid));
+                return resolve(transactionObject.transaction);
             } catch (error) {
-                if (error == "Confirmation declined by user") {
-                    return reject('request-rejected');
-                }
-
+                console.log(error)
                 return reject(error);
             }
         });
@@ -154,7 +157,7 @@ class Token {
                     feeLimit: 100000000                    
                 };
     
-                let transactionObject = await tronLink.tronWeb.transactionBuilder.triggerSmartContract(
+                let transactionObject = await this.provider.web3.transactionBuilder.triggerSmartContract(
                     this.address, 
                     "approve(address,uint256)", 
                     options, 
@@ -162,16 +165,8 @@ class Token {
                     from
                 );
     
-                let signedTransaction = await tronLink.tronWeb.trx.sign(transactionObject.transaction);
-    
-                let {txid} = await tronLink.tronWeb.trx.sendRawTransaction(signedTransaction);
-    
-                return resolve(this.provider.Transaction(txid));
+                resolve(transactionObject.transaction);
             } catch (error) {
-                if (error == "Confirmation declined by user") {
-                    return reject('request-rejected');
-                }
-
                 return reject(error)
             }
         });
@@ -183,7 +178,7 @@ class Token {
      * @returns {Boolean}
      */
     async allowance(owner, spender) {
-        let token = await tronLink.tronWeb.contract().at(this.address);
+        let token = await this.provider.web3.contract().at(this.address);
         let allowance = parseFloat((await token.allowance(owner, spender).call()).toString(10));
         return utils.toDec(allowance, await this.getDecimals());
     }

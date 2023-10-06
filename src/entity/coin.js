@@ -38,8 +38,22 @@ class Coin {
         return this.decimals;
     }
     
+    /**
+     * @param {String} address
+     * @returns {String}
+     */
     async getBalance(address) {
         return parseFloat(this.provider.web3.fromSun(await this.provider.web3.trx.getBalance(address)));
+    }
+
+    /**
+     * @param {String} from
+     * @param {String} to
+     * @param {Float|Integer} amount
+     * @returns {Object}
+     */
+    createTx(from, to, amount) {
+        return this.provider.web3.transactionBuilder.sendTrx(to, amount, from);
     }
 
     /**
@@ -51,7 +65,6 @@ class Coin {
     transfer(from, to, amount) {
         return new Promise(async (resolve, reject) => {
             try {
-
                 if (parseFloat(amount) > await this.getBalance(from)) {
                     return reject('insufficient-balance');
                 }
@@ -60,14 +73,10 @@ class Coin {
                     return reject('transfer-amount-error');
                 }
 
-                amount = tronLink.tronWeb.toSun(amount);
-                let {txid} = await tronLink.tronWeb.trx.sendTransaction(to, amount);
-                return resolve(this.provider.Transaction(txid));
-            } catch (error) {
-                if (error == "Confirmation declined by user") {
-                    return reject('request-rejected');
-                }
+                amount = this.provider.web3.toSun(amount);
 
+                return resolve(await this.createTx(from, to, amount));
+            } catch (error) {
                 return reject(error);
             }
         });

@@ -4,6 +4,7 @@ const utils = require('./utils');
 const Coin = require('./entity/coin');
 const Token = require('./entity/token');
 const Transaction = require('./entity/transaction');
+const { TronLinkAdapter } = require('@tronweb3/tronwallet-adapters');
 
 class Provider {
 
@@ -26,12 +27,14 @@ class Provider {
             node: "mainnet",
             name: "TronGrid Mainnet",
             host: "https://api.trongrid.io",
+            event: "https://api.trongrid.io",
             explorer: "https://tronscan.org/"
         },
         testnet: {
             node: "testnet",
             name: "TronGrid Nile Testnet",
             host: "https://nile.trongrid.io",
+            event: "https://event.nileex.io",
             explorer: "https://nile.tronscan.org/"
         }
     }
@@ -70,6 +73,7 @@ class Provider {
         this.web3 = new TronWeb({
             fullHost: this.network.host,
             solidityNode: this.network.host,
+            eventServer: this.network.event,
         });
 
         this.detectWallets();
@@ -78,16 +82,20 @@ class Provider {
     /**
      * @returns {Promise}
      */
-    connectWallet() {
+    connectWallet(adapter) {
         return new Promise(async (resolve, reject) => {
-            let wallet = this.detectedWallets['tronlink']
-            wallet.connect()
-            .then(() => {
-                resolve(wallet);
-            })
-            .catch(error => {
-                utils.rejectMessage(error, reject);
-            });
+            if (this.detectedWallets[adapter]) {
+                let wallet = this.detectedWallets[adapter];
+                wallet.connect()
+                .then(() => {
+                    resolve(wallet);
+                })
+                .catch(error => {
+                    utils.rejectMessage(error, reject);
+                });
+            } else {
+                reject('wallet-not-found');
+            }
         });
     }
 
@@ -107,7 +115,7 @@ class Provider {
         const Wallet = require('./wallet');
         
         const wallets = {
-            tronlink: new Wallet(this)
+            tronlink: new Wallet('tronlink', this)
         };
 
         return Object.fromEntries(Object.entries(wallets).filter(([key]) => {
@@ -127,9 +135,10 @@ class Provider {
 
     detectWallets() {
         if (typeof window != 'undefined') {
+            const Wallet = require('./wallet');
+
             if (window.tronLink) {
-                const Wallet = require('./wallet');
-                this.detectedWallets['tronlink'] = new Wallet(this);
+                this.detectedWallets['tronlink'] = new Wallet('tronlink', this);
             }
         }
     }
