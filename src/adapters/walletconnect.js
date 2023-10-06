@@ -2,9 +2,6 @@ const { WalletConnectAdapter } = require('@tronweb3/tronwallet-adapters');
 
 module.exports = walletconnect = (provider) => {
 
-    Object.keys(localStorage)
-    .filter(x => x.startsWith('wc@2'))
-    .forEach(x => localStorage.removeItem(x))
     network = provider.testnet ? 'Nile' : 'Mainnet';
     
     const wallet = new WalletConnectAdapter({
