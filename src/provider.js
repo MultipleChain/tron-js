@@ -24,6 +24,7 @@ class Provider {
      */    
     networks = {
         mainnet: {
+            id: "0x2b6653dc",
             node: "mainnet",
             name: "TronGrid Mainnet",
             host: "https://api.trongrid.io",
@@ -31,6 +32,7 @@ class Provider {
             explorer: "https://tronscan.org/"
         },
         testnet: {
+            id: "0xcd8690dc",
             node: "testnet",
             name: "TronGrid Nile Testnet",
             host: "https://nile.trongrid.io",
@@ -115,7 +117,8 @@ class Provider {
         const Wallet = require('./wallet');
         
         const wallets = {
-            tronlink: new Wallet('tronlink', this)
+            tronlink: new Wallet('tronlink', this),
+            tokenpocket: new Wallet('tokenpocket', this),
         };
 
         return Object.fromEntries(Object.entries(wallets).filter(([key]) => {
@@ -140,6 +143,11 @@ class Provider {
             if (window.tronLink) {
                 this.detectedWallets['tronlink'] = new Wallet('tronlink', this);
             }
+
+            //if (window.ethereum && window.ethereum.isTokenPocket) {
+            //if (window.tokenpocket && tokenpocket.ethereum) {
+            this.detectedWallets['tokenpocket'] = new Wallet('tokenpocket', this);
+            
         }
     }
 

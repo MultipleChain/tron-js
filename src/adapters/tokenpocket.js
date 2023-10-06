@@ -1,16 +1,14 @@
-const { TronLinkAdapter } = require('@tronweb3/tronwallet-adapters');
+const { TokenPocketAdapter } = require('@tronweb3/tronwallet-adapters');
 
 module.exports = tronlink = (provider) => {
     
-    const wallet = new TronLinkAdapter({
-        checkTimeout: 2000,
-    });
+    const wallet = new TokenPocketAdapter();
 
     const connect = async () => {
         return new Promise(async (resolve, reject) => {
             try {
                 wallet.connect()
-                .then(async () => {
+                .then(() => {
                     resolve(wallet);
                 })
                 .catch(error => {
@@ -23,18 +21,16 @@ module.exports = tronlink = (provider) => {
     }
 
     return {
-        key: 'tronlink',
-        name: 'TronLink',
+        key: 'tokenpocket',
+        name: 'TokenPocket',
         supports: [
-            'browser',
             'mobile'
         ],
         connect,
-        deepLink: 'tronlinkoutside://pull.activity?param=' + JSON.stringify({
+        deepLink: 'tpdapp://open?param=' + JSON.stringify({
             "url": "{siteUrl}", 
-            "action": "open",
-            "protocol": "tronlink",
-            "version": "1.0"
+            "chain": "Tron",
+            "source": "{siteUrl}",
         }),
         download: 'https://www.tronlink.org/dlDetails/',
         detected : Boolean(typeof window.tronLink != 'undefined')

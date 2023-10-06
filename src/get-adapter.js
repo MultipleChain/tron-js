@@ -1,5 +1,6 @@
 const adapters = {
     tronlink: require('./adapters/tronlink'),
+    tokenpocket: require('./adapters/tokenpocket'),
 }
 
 /**

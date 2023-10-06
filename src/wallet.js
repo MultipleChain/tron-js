@@ -83,12 +83,16 @@ class Wallet {
         return new Promise((resolve, reject) => {
             this.adapter.connect()
             .then(async wallet => {
-                this.wallet = wallet;
-                this.provider.setConnectedWallet(this);
-
-                this.connectedAccount = wallet.address;
-                this.connectedNetwork = this.provider.network;
-                resolve(this.connectedAccount);
+                if (this.provider.network.id != (await wallet.network()).chainId) {
+                    reject('not-accepted-chain');
+                } else {
+                    this.wallet = wallet;
+                    this.provider.setConnectedWallet(this);
+    
+                    this.connectedAccount = wallet.address;
+                    this.connectedNetwork = this.provider.network;
+                    resolve(this.connectedAccount);
+                }
             })
             .catch(error => {
                 utils.rejectMessage(error, reject);
@@ -238,7 +242,7 @@ class Wallet {
      * @returns {Mixed}
      */
     async triggerSmartContract(...params) {
-        return this.wallet.transactionBuilder.triggerSmartContract(...params);
+        return this.provider.web3.transactionBuilder.triggerSmartContract(...params);
     }
     
     /**
@@ -258,6 +262,43 @@ class Wallet {
         } 
 
         return true;
+    }
+
+    // Events    
+    chainChanged(callback) {
+        this.wallet.on('chainChanged', (chainHexId) => {
+            callback(chainHexId);
+        });
+    }
+
+    accountsChanged(callback) {
+        this.wallet.on('accountsChanged', (accounts) => {
+            callback(accounts);
+        });
+    }
+
+    networkChanged(callback) {
+        this.wallet.on('networkChanged', (param) => {
+            callback(param);
+        });
+    }
+
+    readyStateChanged(callback) {
+        this.wallet.on('readyStateChanged', (param) => {
+            callback(param);
+        });
+    }
+    
+    connectEvent(callback) {
+        this.wallet.on('connect', (code, reason) => {
+            callback(code, reason);
+        });
+    }
+    
+    disconnectEvent(callback) {
+        this.wallet.on('disconnect', (code, reason) => {
+            callback(code, reason);
+        });
     }
 } 
 
