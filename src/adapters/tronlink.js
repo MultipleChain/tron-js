@@ -11,6 +11,7 @@ module.exports = tronlink = (provider) => {
             try {
                 wallet.connect()
                 .then(async () => {
+                    await wallet.switchChain(provider.network.id);
                     resolve(wallet);
                 })
                 .catch(error => {
