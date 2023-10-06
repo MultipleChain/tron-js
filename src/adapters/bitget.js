@@ -1,8 +1,8 @@
-const { TokenPocketAdapter } = require('@tronweb3/tronwallet-adapters');
+const { BitKeepAdapter } = require('@tronweb3/tronwallet-adapters');
 
-module.exports = tokenpocket = (provider) => {
+module.exports = bitget = (provider) => {
     
-    const wallet = new TokenPocketAdapter();
+    const wallet = new BitKeepAdapter();
 
     const connect = async () => {
         return new Promise(async (resolve, reject) => {
@@ -21,17 +21,15 @@ module.exports = tokenpocket = (provider) => {
     }
 
     return {
-        key: 'tokenpocket',
-        name: 'TokenPocket',
+        key: 'bitget',
+        name: 'Bitget Wallet',
         supports: [
+            'browser',
             'mobile'
         ],
         connect,
-        deepLink: 'tpdapp://open?param=' + JSON.stringify({
-            "url": "{siteUrl}", 
-            "chain": "Tron",
-            "source": "{siteUrl}",
-        }),
-        download: 'https://www.tokenpocket.pro/en/download/app'
+        deepLink: 'https://bkcode.vip?action=dapp&url={siteUrl}',
+        download: 'https://web3.bitget.com/en/wallet-download?type=3',
+        detected : Boolean(window.bitkeep && window.bitkeep.tronLink)
     }
 }

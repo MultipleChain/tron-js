@@ -6,19 +6,11 @@ module.exports = tronlink = (provider) => {
         checkTimeout: 2000,
     });
 
-    const sleep = (ms) => {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
     const connect = async () => {
         return new Promise(async (resolve, reject) => {
             try {
                 wallet.connect()
                 .then(async () => {
-                    if (provider.network.id != (await wallet.network()).chainId) {
-                        await wallet.switchChain(provider.network.id);
-                        await sleep(100);
-                    }
                     resolve(wallet);
                 })
                 .catch(error => {
@@ -31,20 +23,15 @@ module.exports = tronlink = (provider) => {
     }
 
     return {
-        key: 'tronlink',
-        name: 'TronLink',
+        key: 'okx',
+        name: 'Okx Wallet',
         supports: [
             'browser',
             'mobile'
         ],
         connect,
-        deepLink: 'tronlinkoutside://pull.activity?param=' + JSON.stringify({
-            "url": "{siteUrl}", 
-            "action": "open",
-            "protocol": "tronlink",
-            "version": "1.0"
-        }),
-        download: 'https://www.tronlink.org/dlDetails/',
-        detected : Boolean(typeof window.tronLink != 'undefined')
+        deepLink: 'okx://wallet/dapp/details?dappUrl={siteUrl}',
+        download: 'https://www.okx.com/download',
+        detected : Boolean(window.okxwallet && window.okxwallet.tronLink)
     }
 }

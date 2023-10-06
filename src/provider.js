@@ -119,6 +119,8 @@ class Provider {
         const wallets = {
             tronlink: new Wallet('tronlink', this),
             tokenpocket: new Wallet('tokenpocket', this),
+            bitget: new Wallet('bitget', this),
+            okx: new Wallet('okx', this),
         };
 
         return Object.fromEntries(Object.entries(wallets).filter(([key]) => {
@@ -148,6 +150,13 @@ class Provider {
             //if (window.tokenpocket && tokenpocket.ethereum) {
             this.detectedWallets['tokenpocket'] = new Wallet('tokenpocket', this);
             
+            if (window.bitkeep && bitkeep.tronLink) {
+                this.detectedWallets['bitget'] = new Wallet('bitget', this);
+            }
+
+            if (window.okxwallet && window.okxwallet.tronLink) {
+                this.detectedWallets['okx'] = new Wallet('okx', this);
+            }
         }
     }
 
