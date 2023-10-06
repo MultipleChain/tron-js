@@ -19,6 +19,16 @@ class Provider {
     testnet = false;
 
     /**
+     * @var {String}
+     */
+    wcProjectId;
+
+    /**
+     * @var {String}
+     */
+    wcThemeMode = 'light';
+
+    /**
      * @var {Object}
      *  
      */    
@@ -66,6 +76,8 @@ class Provider {
      */
     constructor(options) {
         this.testnet = options.testnet;
+        this.wcProjectId = options.wcProjectId;
+        this.wcThemeMode = options.wcThemeMode || 'light';
 
         this.network = this.networks[this.testnet ? 'testnet' : 'mainnet'];
         if (!this.testnet && options.customRpc) {
@@ -121,6 +133,7 @@ class Provider {
             tokenpocket: new Wallet('tokenpocket', this),
             bitget: new Wallet('bitget', this),
             okx: new Wallet('okx', this),
+            walletconnect: new Wallet('walletconnect', this),
         };
 
         return Object.fromEntries(Object.entries(wallets).filter(([key]) => {
@@ -145,10 +158,6 @@ class Provider {
             if (window.tronLink) {
                 this.detectedWallets['tronlink'] = new Wallet('tronlink', this);
             }
-
-            //if (window.ethereum && window.ethereum.isTokenPocket) {
-            //if (window.tokenpocket && tokenpocket.ethereum) {
-            this.detectedWallets['tokenpocket'] = new Wallet('tokenpocket', this);
             
             if (window.bitkeep && bitkeep.tronLink) {
                 this.detectedWallets['bitget'] = new Wallet('bitget', this);
@@ -157,6 +166,12 @@ class Provider {
             if (window.okxwallet && window.okxwallet.tronLink) {
                 this.detectedWallets['okx'] = new Wallet('okx', this);
             }
+
+            //if (window.ethereum && window.ethereum.isTokenPocket) {
+            //if (window.tokenpocket && tokenpocket.ethereum) {
+            this.detectedWallets['tokenpocket'] = new Wallet('tokenpocket', this);
+
+            this.detectedWallets['walletconnect'] = new Wallet('walletconnect', this);
         }
     }
 

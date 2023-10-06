@@ -3,6 +3,7 @@ const adapters = {
     tokenpocket: require('./adapters/tokenpocket'),
     bitget: require('./adapters/bitget'),
     okx: require('./adapters/okx'),
+    walletconnect: require('./adapters/walletconnect'),
 }
 
 /**

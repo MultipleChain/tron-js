@@ -15,6 +15,8 @@ module.exports = Object.assign(utils, {
                 return reject('request-rejected');
             } else if (String(error.message).includes('The wallet is not found.')) {
                 return reject('wallet-not-found');
+            } else if (String(error.message).includes('User disapproved requested chains')) {
+                return reject('not-accepted-chain');
             }
         }
 

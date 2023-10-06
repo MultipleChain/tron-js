@@ -83,16 +83,18 @@ class Wallet {
         return new Promise((resolve, reject) => {
             this.adapter.connect()
             .then(async wallet => {
-                if (this.provider.network.id != (await wallet.network()).chainId) {
-                    reject('not-accepted-chain');
-                } else {
-                    this.wallet = wallet;
-                    this.provider.setConnectedWallet(this);
-    
-                    this.connectedAccount = wallet.address;
-                    this.connectedNetwork = this.provider.network;
-                    resolve(this.connectedAccount);
+                if (wallet.network) {
+                    if (this.provider.network.id != (await wallet.network()).chainId) {
+                        return reject('not-accepted-chain');
+                    } 
                 }
+
+                this.wallet = wallet;
+                this.provider.setConnectedWallet(this);
+
+                this.connectedAccount = wallet.address;
+                this.connectedNetwork = this.provider.network;
+                resolve(this.connectedAccount);
             })
             .catch(error => {
                 utils.rejectMessage(error, reject);
