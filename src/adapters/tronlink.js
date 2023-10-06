@@ -10,8 +10,7 @@ module.exports = tronlink = (provider) => {
         return new Promise(async (resolve, reject) => {
             try {
                 wallet.connect()
-                .then(async () => {
-                    await wallet.switchChain(provider.network.id);
+                .then(() => {
                     resolve(wallet);
                 })
                 .catch(error => {
