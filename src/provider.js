@@ -171,7 +171,9 @@ class Provider {
                 this.detectedWallets['tokenpocket'] = new Wallet('tokenpocket', this);
             }
 
-            this.detectedWallets['walletconnect'] = new Wallet('walletconnect', this);
+            if (this.wcProjectId) {
+                this.detectedWallets['walletconnect'] = new Wallet('walletconnect', this);
+            }
         }
     }
 
