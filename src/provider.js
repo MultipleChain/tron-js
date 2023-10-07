@@ -133,8 +133,11 @@ class Provider {
             tokenpocket: new Wallet('tokenpocket', this),
             bitget: new Wallet('bitget', this),
             okx: new Wallet('okx', this),
-            walletconnect: new Wallet('walletconnect', this),
         };
+
+        if (this.wcProjectId) {
+            wallets['walletconnect'] = new Wallet('walletconnect', this);
+        }
 
         return Object.fromEntries(Object.entries(wallets).filter(([key]) => {
             return !filter ? true : filter.includes(key);
