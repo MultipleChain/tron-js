@@ -64,7 +64,7 @@ class Provider {
     /**
      * @var {Object}
      */
-    detectedWallets = [];
+    supportedWallets = {};
 
     /**
      * @var {Object}
@@ -90,7 +90,7 @@ class Provider {
             eventServer: this.network.event,
         });
 
-        this.detectWallets();
+        this.initSupportedWallets();
     }
 
     /**
@@ -121,14 +121,12 @@ class Provider {
     }
 
     /**
-     * @param {Array|null} filter 
-     * @returns {Array}
+     * @returns {void}
      */
-    getSupportedWallets(filter) {
-
+    initSupportedWallets() {
         const Wallet = require('./wallet');
         
-        const wallets = {
+        this.supportedWallets = {
             tronlink: new Wallet('tronlink', this),
             tokenpocket: new Wallet('tokenpocket', this),
             bitget: new Wallet('bitget', this),
@@ -136,10 +134,17 @@ class Provider {
         };
 
         if (this.wcProjectId) {
-            wallets['walletconnect'] = new Wallet('walletconnect', this);
+            this.supportedWallets['walletconnect'] = new Wallet('walletconnect', this);
         }
 
-        return Object.fromEntries(Object.entries(wallets).filter(([key]) => {
+    }
+
+    /**
+     * @param {Array|null} filter 
+     * @returns {Array}
+     */
+    getSupportedWallets(filter) {
+        return Object.fromEntries(Object.entries(this.supportedWallets).filter(([key]) => {
             return !filter ? true : filter.includes(key);
         }));
     }
@@ -149,8 +154,9 @@ class Provider {
      * @returns {Array}
      */
     getDetectedWallets(filter) {
-        return Object.fromEntries(Object.entries(this.detectedWallets).filter(([key]) => {
-            return !filter ? true : filter.includes(key);
+        let detectedWallets = this.getSupportedWallets(filter);
+        return Object.fromEntries(Object.entries(detectedWallets).filter(([key, value]) => {
+            return value.isDetected() == undefined ? true : value.isDetected();
         }));
     }
 

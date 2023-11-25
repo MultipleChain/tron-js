@@ -1,6 +1,6 @@
 const { OkxWalletAdapter } = require('@tronweb3/tronwallet-adapters');
 
-module.exports = okx = (provider) => {
+module.exports = okx = () => {
     
     const wallet = new OkxWalletAdapter({
         checkTimeout: 2000,
@@ -32,6 +32,6 @@ module.exports = okx = (provider) => {
         connect,
         deepLink: 'okx://wallet/dapp/details?dappUrl={siteUrl}',
         download: 'https://www.okx.com/download',
-        detected : Boolean(window.okxwallet && window.okxwallet.tronLink)
+        isDetected: () => Boolean(window.okxwallet && window.okxwallet.tronLink)
     }
 }

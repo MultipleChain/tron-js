@@ -1,6 +1,6 @@
 const { BitKeepAdapter } = require('@tronweb3/tronwallet-adapters');
 
-module.exports = bitget = (provider) => {
+module.exports = bitget = () => {
     
     const wallet = new BitKeepAdapter();
 
@@ -30,6 +30,6 @@ module.exports = bitget = (provider) => {
         connect,
         deepLink: 'https://bkcode.vip?action=dapp&url={siteUrl}',
         download: 'https://web3.bitget.com/en/wallet-download?type=3',
-        detected : Boolean(window.bitkeep && window.bitkeep.tronLink)
+        isDetected: () => Boolean(window.bitkeep && window.bitkeep.tronLink)
     }
 }

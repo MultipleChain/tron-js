@@ -33,6 +33,6 @@ module.exports = (provider) => {
             "source": "{siteUrl}",
         }),
         download: 'https://www.tokenpocket.pro/en/download/app',
-        detected : Boolean(window.tokenpocket && window.tokenpocket.tron)
+        isDetected: () => Boolean(window.tokenpocket && window.tokenpocket.tron)
     }
 }
