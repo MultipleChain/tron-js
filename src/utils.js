@@ -2,9 +2,10 @@ const utils = require('@multiplechain/utils');
 
 module.exports = Object.assign(utils, {
     rejectMessage(error, reject) {
+        console.log(error)
         
         if (error == 'Cannot transfer TRX to the same account') {
-            reject('same-account');
+            return reject('same-account');
         }
 
         if (typeof error == 'object') {
@@ -22,6 +23,8 @@ module.exports = Object.assign(utils, {
                 return reject('wallet-not-found');
             } else if (String(error.message).includes('User disapproved requested chains')) {
                 return reject('not-accepted-chain');
+            } else if (error.message.includes('The QR window is closed.')) {
+                return reject('closed-walletconnect-modal');
             }
         }
 

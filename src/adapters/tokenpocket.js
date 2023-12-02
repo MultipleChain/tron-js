@@ -1,6 +1,6 @@
-const { TokenPocketAdapter } = require('@tronweb3/tronwallet-adapters');
+const { TokenPocketAdapter } = require('@tronweb3/tronwallet-adapter-tokenpocket');
 
-module.exports = (provider) => {
+module.exports = () => {
     
     const wallet = new TokenPocketAdapter();
 

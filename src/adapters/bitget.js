@@ -1,6 +1,6 @@
-const { BitKeepAdapter } = require('@tronweb3/tronwallet-adapters');
+const { BitKeepAdapter } = require('@tronweb3/tronwallet-adapter-bitkeep');
 
-module.exports = bitget = () => {
+module.exports = () => {
     
     const wallet = new BitKeepAdapter();
 

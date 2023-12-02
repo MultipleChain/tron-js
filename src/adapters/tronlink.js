@@ -1,6 +1,6 @@
-const { TronLinkAdapter } = require('@tronweb3/tronwallet-adapters');
+const { TronLinkAdapter } = require('@tronweb3/tronwallet-adapter-tronlink');
 
-module.exports = tronlink = (provider) => {
+module.exports = (provider) => {
     
     const wallet = new TronLinkAdapter({
         checkTimeout: 2000,

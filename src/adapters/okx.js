@@ -1,6 +1,6 @@
-const { OkxWalletAdapter } = require('@tronweb3/tronwallet-adapters');
+const { OkxWalletAdapter } = require('@tronweb3/tronwallet-adapter-okxwallet');
 
-module.exports = okx = () => {
+module.exports = () => {
     
     const wallet = new OkxWalletAdapter({
         checkTimeout: 2000,

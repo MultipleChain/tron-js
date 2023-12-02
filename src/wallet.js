@@ -81,6 +81,11 @@ class Wallet {
     
     connect() {
         return new Promise((resolve, reject) => {
+
+            if (this.getKey() == 'walletconnect') {
+                this.adapter.removeOldConnection();
+            }
+
             this.adapter.connect()
             .then(async wallet => {
                 if (wallet.network) {

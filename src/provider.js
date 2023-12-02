@@ -4,7 +4,6 @@ const utils = require('./utils');
 const Coin = require('./entity/coin');
 const Token = require('./entity/token');
 const Transaction = require('./entity/transaction');
-const { TronLinkAdapter } = require('@tronweb3/tronwallet-adapters');
 
 class Provider {
 

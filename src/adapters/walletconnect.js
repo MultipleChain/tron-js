@@ -1,6 +1,6 @@
-const { WalletConnectAdapter } = require('@tronweb3/tronwallet-adapters');
+const { WalletConnectAdapter } = require('../tronwallet-adapter-walletconnect/lib/esm/index');
 
-module.exports = walletconnect = (provider) => {
+module.exports = (provider) => {
 
     network = provider.testnet ? 'Nile' : 'Mainnet';
     
@@ -10,16 +10,15 @@ module.exports = walletconnect = (provider) => {
             relayUrl: 'wss://relay.walletconnect.com',
             projectId: provider.wcProjectId,
         },
-        web3ModalConfig: {
-            themeVariables: {
-                '--w3m-z-index': 999999999999,
-            },
-            themeMode: provider.wcThemeMode,
-            explorerExcludedWalletIds: "ALL",
-            explorerRecommendedWalletIds: [
-                '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0'
+        qrcodeModalOptions: { 
+            mobileLinks: [
+                "trust"
             ],
-        },
+            desktopLinks: [
+                // 'zerion', 
+                // 'ledger'
+            ]
+        }
     });
 
     const connect = async () => {
@@ -49,7 +48,10 @@ module.exports = walletconnect = (provider) => {
         removeOldConnection: () => {
             Object.keys(localStorage)
             .filter(x => x.startsWith('wc@2'))
-            .forEach(x => localStorage.removeItem(x))
+            .forEach(x => localStorage.removeItem(x));
+            localStorage.removeItem('walletconnect');
+            localStorage.removeItem('WALLETCONNECT_DEEPLINK_CHOICE');
+            document.cookie = 'wl-connected' + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         },
     }
 }
