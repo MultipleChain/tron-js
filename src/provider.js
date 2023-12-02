@@ -64,7 +64,7 @@ class Provider {
     /**
      * @var {Object}
      */
-    supportedWallets = {};
+    supportedWallets;
 
     /**
      * @var {Object}
@@ -89,8 +89,6 @@ class Provider {
             solidityNode: this.network.host,
             eventServer: this.network.event,
         });
-
-        this.initSupportedWallets();
     }
 
     /**
@@ -122,29 +120,25 @@ class Provider {
     }
 
     /**
-     * @returns {void}
-     */
-    initSupportedWallets() {
-        const Wallet = require('./wallet');
-        
-        this.supportedWallets = {
-            tronlink: new Wallet('tronlink', this),
-            tokenpocket: new Wallet('tokenpocket', this),
-            bitget: new Wallet('bitget', this),
-            okx: new Wallet('okx', this),
-        };
-
-        if (this.wcProjectId) {
-            this.supportedWallets['walletconnect'] = new Wallet('walletconnect', this);
-        }
-
-    }
-
-    /**
      * @param {Array|null} filter 
      * @returns {Array}
      */
     getSupportedWallets(filter) {
+        if (!this.supportedWallets) {
+            const Wallet = require('./wallet');
+            
+            this.supportedWallets = {
+                tronlink: new Wallet('tronlink', this),
+                tokenpocket: new Wallet('tokenpocket', this),
+                bitget: new Wallet('bitget', this),
+                okx: new Wallet('okx', this),
+            };
+
+            if (this.wcProjectId) {
+                this.supportedWallets['walletconnect'] = new Wallet('walletconnect', this);
+            }
+        }
+
         return Object.fromEntries(Object.entries(this.supportedWallets).filter(([key]) => {
             return !filter ? true : filter.includes(key);
         }));
@@ -159,32 +153,6 @@ class Provider {
         return Object.fromEntries(Object.entries(detectedWallets).filter(([key, value]) => {
             return value.isDetected() == undefined ? true : value.isDetected();
         }));
-    }
-
-    detectWallets() {
-        if (typeof window != 'undefined') {
-            const Wallet = require('./wallet');
-
-            if (window.tronLink && window.tronLink.tronlinkParams) {
-                this.detectedWallets['tronlink'] = new Wallet('tronlink', this);
-            }
-            
-            if (window.bitkeep && bitkeep.tronLink) {
-                this.detectedWallets['bitget'] = new Wallet('bitget', this);
-            }
-
-            if (window.okxwallet && window.okxwallet.tronLink) {
-                this.detectedWallets['okx'] = new Wallet('okx', this);
-            }
-
-            if (window.tokenpocket && window.tokenpocket.tron) {
-                this.detectedWallets['tokenpocket'] = new Wallet('tokenpocket', this);
-            }
-
-            if (this.wcProjectId) {
-                this.detectedWallets['walletconnect'] = new Wallet('walletconnect', this);
-            }
-        }
     }
 
     /**
