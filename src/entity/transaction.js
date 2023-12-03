@@ -113,43 +113,38 @@ class Transaction {
      * @param {Number} timer 
      * @returns {Boolean}
      */
-    validate(timer = 1) {
+    async validate(timer = 1) {
         timer = this.timer || timer;
-        return new Promise((resolve, reject) => {
-            this.intervalValidate = setInterval(async () => {
-                try {
+        try {
+            await this.getData();
+            let result = null;
+            let data = await this.getData();
 
-                    let result = null;
-                    let data = await this.getData();
-
-                    if (data.info && data.info.blockNumber) {
-                        if (data.ret[0].contractRet == 'REVERT') {
-                            result = false;
-                        } else if (data.info.result == 'FAILED') {
-                            result = false;
-                        } else {
-                            result = true;
-                        }
-                    }
-
-                    if (typeof result == 'boolean') {
-                        clearInterval(this.intervalValidate);
-                        if (result == true) {
-                            resolve(true);
-                        } else {
-                            reject(false);
-                        }
-                    }
-                } catch (error) {
-                    if (error.message == 'data-request-failed') {
-                        this.validate(timer);
-                    } else {
-                        clearInterval(this.intervalValidate);
-                        reject(error);
-                    }
+            if (data.info && data.info.blockNumber) {
+                if (data.ret[0].contractRet == 'REVERT') {
+                    result = false;
+                } else if (data.info.result == 'FAILED') {
+                    result = false;
+                } else {
+                    result = true;
                 }
-            }, (timer*1000));
-        });
+            }
+
+            
+            if (typeof result == 'boolean') {
+                return result;
+            }
+
+            await new Promise(r => setTimeout(r, (timer*1000)));
+
+            return this.validate(timer);
+        } catch (error) {
+            if (error.message == 'data-request-failed') {
+                return this.validate(timer);
+            } else {
+                throw error;
+            }
+        }
     }
 
     /**
