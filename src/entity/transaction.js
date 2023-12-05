@@ -118,12 +118,11 @@ class Transaction {
         try {
             await this.getData();
             let result = null;
-            let data = await this.getData();
 
-            if (data.info && data.info.blockNumber) {
-                if (data.ret[0].contractRet == 'REVERT') {
+            if (this.data.info && this.data.info.blockNumber) {
+                if (this.data.ret[0].contractRet == 'REVERT') {
                     result = false;
-                } else if (data.info.result == 'FAILED') {
+                } else if (this.data.info.result == 'FAILED') {
                     result = false;
                 } else {
                     result = true;
